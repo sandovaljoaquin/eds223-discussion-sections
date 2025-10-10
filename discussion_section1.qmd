@@ -1,0 +1,59 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+## 1. Gettimg Started 
+
+```{r}
+library(here)
+library(tidyverse)
+library(sf)
+library(stars)
+library(tmap)
+```
+
+Read in spatial objects from Rapa Nui: 
+ei_points : several points on island
+ei_elev: raster with elevation data 
+ei_borders: polygon with island outline 
+ei_roads: lines contain road network for the island 
+
+
+```{r}
+ei_points <- st_read(here("data", "ei_points.gpkg")) |> 
+  filter(type == "volcano")
+ei_elev <- read_stars(here("data", "ei_elev.tif"))
+ei_borders <- st_read(here("data", "ei_border.gpkg"))
+ei_roads <- st_read(here("data", "ei_roads.gpkg"))
+```
+
+## 2. Create a single object map with tmap 
+
+```{r}
+tm_shape(ei_borders) + 
+  tm_borders()  +
+  tm_layout(main.title = "Easter Island")
+```
+
+## 3. Create multiple object with tmap 
+
+```{r}
+
+tm_shape(ei_borders) + 
+  tm_graticules() + 
+  tm_borders() + 
+tm_shape(ei_elev) + 
+  tm_raster(col.scale = tm_scale_continuous(values = "-rd_yl_gn")) + 
+tm_shape(ei_points) + 
+  tm_dots() + 
+tm_shape(ei_roads) + 
+  tm_lines() +
+tm_compass(position = c("right", "top")) + 
+tm_scalebar()+ 
+tm_lines() +
+tm_layout(main.title = "Easter Island") 
+
+```
+

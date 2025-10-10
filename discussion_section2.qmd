@@ -1,0 +1,103 @@
+---
+title: "discussion_section2"
+format: html
+---
+
+1.  Get started
+
+```{r}
+library(tidyverse)
+library(sf)
+library(tmap)
+```
+
+```{r}
+col <- st_read(here::here("data", "Colombia","Colombia.shp"))
+
+roads <- st_read(here::here("data","RDLINE_colombia", "RDLINE_colombia.shp"))
+
+aves <- st_read(here::here("data", "dataves.csv")) |> 
+ as_tibble() |> 
+  rename(long = decimal_longitude, 
+         lat = decimal_latitude) |> 
+  st_as_sf(coords = c("long", "lat"), crs = 4326) # You get the crs from metadeta
+```
+
+2.  View class and geometry shape
+
+```{r}
+# View class of each object 
+
+class(col)
+class(roads)
+class(aves)
+
+# View geometry type 
+
+unique(st_geometry_type(col))
+unique(st_geometry_type(roads))
+unique(st_geometry_type(aves))
+```
+
+#3. Select a macro ecoregion of interest
+
+```{r}
+
+amazon <- col |> 
+  filter(N1_MacroBi == "Amazonian") 
+
+tm_shape(amazon) + 
+  tm_polygons() + 
+  tm_title("Amazonian Region of Columbia")
+
+```
+4. Play with a coordinate reference system (CRS)
+
+```{r}
+st_crs(col)
+st_crs(roads)
+st_crs(aves)
+
+st_crs(col)$units
+st_crs(roads)$units
+st_crs(aves)$units
+```
+```{r}
+
+aves_df_purrr <- aves |> 
+  # Extract lat & long from geometry column
+  mutate(lon = unlist(purrr:: map(aves$geometry, 1)), # longitude = first component (x)
+         lat = unlist(purrr::map(aves$geometry, 2))) |> # latitude = second component (y)
+  # 
+           st_drop_geometry()
+
+```
+
+5. Make a map 
+- check that the crs of the ecoregions and roads datasets match - transform the crs of bird observations dataset st_transform()
+- use tmap to plot ecoregions, roads, and bird observations 
+
+```{r}
+# Check to see if crs match 
+
+st_crs(col) == st_crs(roads)
+
+```
+
+```{r}
+# transform bird observation dataset into same CRS 
+aves <- st_transform(aves, crs = st_crs(col))
+```
+
+```{r}
+# Plot 
+
+tm_shape(col) + 
+  tm_polygons() + 
+tm_shape(roads) + 
+  tm_lines() + 
+tm_shape(aves) + 
+  tm_dots() + 
+  tm_title("Colombia Amazonian Bird Observation and roads")
+```
+
