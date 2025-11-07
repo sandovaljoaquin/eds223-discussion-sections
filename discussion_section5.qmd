@@ -1,0 +1,22 @@
+---
+title: "Week 5: Discussion Section"
+format: html
+editor: visual
+---
+
+## 1. Get Started
+
+```{r}
+library(tidyverse)
+library(sf)
+library(terra)
+library(spData)
+```
+
+You will be working with the following datasets: - High points in New Zealand, obtained from spData - Artificial grain dataset (with three classes: clay, silt, and sand), obtained from spData
+
+```{r}
+nz_height <- nz_height
+grain <- terra::rast(system.file("raster/grain.tif", package = "spData"))
+```
+
