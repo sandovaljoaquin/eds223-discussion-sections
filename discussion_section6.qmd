@@ -129,5 +129,5 @@ d_nbr_rast <- pre_nbr_rast - post_nbr_rast
 
 ```{r}
 plot(d_nbr_rast, main = "Cold Springs Difference NBR", colNA = "black")
-``
+```
 
